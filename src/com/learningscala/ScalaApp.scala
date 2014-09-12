@@ -17,6 +17,14 @@ object ScalaApp {
     println(cv1)
   }
 
+  def arrayTest(): Unit ={
+    val myarray = Array(6, 3, 4, 5, 6)
+    val mapped = myarray.map(x => x + 3)
+    val filtered = mapped.filter(x => x < 5)
+    filtered
+    val myrange = Array.range(10,20)
+  }
+
   def treeTest(): Unit ={
     val mytree =
       Node(
