@@ -8,11 +8,9 @@ object ScalaApp {
     treeTest()
   }
 
-  def helloworld(): Unit ={
-    println("HelloWorld!")
-  }
+  def helloworld() = println("HelloWorld!")
 
-  def complexVariableTest(): Unit ={
+  def complexVariableTest() = {
     val cv1 = new Complex(1,1)
     println(cv1)
   }
@@ -21,11 +19,11 @@ object ScalaApp {
     val myarray = Array(6, 3, 4, 5, 6)
     val mapped = myarray.map(x => x + 3)
     val filtered = mapped.filter(x => x < 5)
-    filtered
-    val myrange = Array.range(10,20)
+    val myrange = (1 to 20).map(x => x + 1)
+    myrange
   }
 
-  def treeTest(): Unit ={
+  def treeTest() = {
     val mytree =
       Node(
         Node(
