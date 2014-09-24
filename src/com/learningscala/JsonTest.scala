@@ -5,29 +5,19 @@ import spray.json._
 import spray.json.DefaultJsonProtocol._
 import MyJsonProtocol._
 
-class Feature(val row: Double, val col: Double, val scale: Double, val direction: Double)
-
 class Descriptor(val row: Double, val col: Double, val scale: Double, val direction: Double, val vector: Vector[Double])
 
 object MyJsonProtocol {
 
-  implicit object FeatureJsonFormat extends RootJsonFormat[Feature] {
+  implicit def vectorToJson(v: Vector[Double]) = {
+    v.map(x=>JsNumber(x)).toList
+  }
 
-    def write(f: Feature) = JsObject(
-      "row" -> JsNumber(f.row),
-      "col" -> JsNumber(f.col),
-      "scale" -> JsNumber(f.scale),
-      "direction" -> JsNumber(f.direction)
-    )
-
-    def read(json: JsValue) = {
-      json.asJsObject.getFields("row", "col", "scale", "direction", "vector") match {
-        case Seq(JsNumber(row), JsNumber(col), JsNumber(scale), JsNumber(direction)) =>
-          new Feature(row.toDouble, col.toDouble, scale.toDouble, direction.toDouble)
-        case _ => throw new DeserializationException("value is invalid!")
-      }
+  implicit def jsarrayToVector(vector: Vector[JsValue]) = {
+    vector.map {
+      case JsNumber(n) => n.toDouble
+      case _ => throw new DeserializationException("Vector is invalid!")
     }
-
   }
 
   implicit object DescriptorJsonFormat extends RootJsonFormat[Descriptor] {
@@ -37,13 +27,13 @@ object MyJsonProtocol {
       "col" -> JsNumber(f.col),
       "scale" -> JsNumber(f.scale),
       "direction" -> JsNumber(f.direction),
-      "vector" -> JsArray(f.vector.map(x=>JsNumber(x)).toList)
+      "vector" -> JsArray(f.vector)
     )
 
     def read(json: JsValue) = {
-      json.asJsObject.getFields("row", "col", "scale", "direction") match {
-        case Seq(JsNumber(row), JsNumber(col), JsNumber(scale), JsNumber(direction)) =>
-          new Descriptor(row.toDouble, col.toDouble, scale.toDouble, direction.toDouble, Vector[Double](1,2,3,4))
+      json.asJsObject.getFields("row", "col", "scale", "direction", "vector") match {
+        case Seq(JsNumber(row), JsNumber(col), JsNumber(scale), JsNumber(direction), JsArray(vector: List[JsValue])) =>
+          new Descriptor(row.toDouble, col.toDouble, scale.toDouble, direction.toDouble, vector.toVector)
         case _ => throw new DeserializationException("value is invalid!")
       }
     }
@@ -55,7 +45,6 @@ object MyJsonProtocol {
 object JsonTest {
 
   def main(args: Array[String]) = {
-    featureTest()
     descriptorTest()
   }
 
@@ -65,20 +54,6 @@ object JsonTest {
     println(jsonAst)
     val objAgain = jsonAst.convertTo[Descriptor]
     println(objAgain.vector)
-  }
-
-  def featureTest() = {
-    val jsonObj = Map(
-      "col" -> 1,
-      "row" ->2,
-      "direction" -> 3,
-      "scale" -> 4
-    )
-    val jsonAst = jsonObj.toJson
-    println(jsonAst)
-    println(jsonAst.asJsObject.fields("scale"))
-    val scalaObj = jsonAst.convertTo[Feature]
-    println(scalaObj)
   }
 
   def jsonFileTest() = {
