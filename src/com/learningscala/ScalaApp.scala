@@ -6,7 +6,7 @@ object ScalaApp {
     helloworld()
     ComplexTest.complexVariableTest()
     TreeTest.treeTest()
-    JsonTest.jsonTest()
+    JsonTest.featureTest()
   }
 
   def helloworld() = println("HelloWorld!")
